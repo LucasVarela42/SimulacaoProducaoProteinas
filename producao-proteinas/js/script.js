@@ -9,7 +9,6 @@ var render = new THREE.WebGLRenderer({
 var loader = new THREE.PDBLoader();
 var labelRenderer = new THREE.CSS2DRenderer();
 var menu;
-var modelos;
 var MOLECULES = {
     "Ethanol": "ethanol.pdb",
     "Aspirin": "aspirin.pdb",
@@ -30,15 +29,17 @@ var MOLECULES = {
     "Graphite": "graphite.pdb"
 };
 
+var teclas = [];
 var controls = new THREE.TrackballControls(camera);
 var dragControls;
 
 // used for drag and drop
+var modelos = [];
 var plane;
 var selection;
 var offset = new THREE.Vector3();
-var objects = [];
 var raycaster = new THREE.Raycaster();
+
 //#region Init
 function init() {
 
@@ -78,13 +79,10 @@ function init() {
     stats.showPanel(0); // 0: fps, 1: ms, 2: mb, 3+: custom
     document.body.appendChild(stats.dom);
 
-    //intancia dos modelos 
-    modelos = new THREE.Group();
-
-    cena.add(modelos);
 
     //Carrega modelo inicial e cria menu
-    loadMolecule('models/molecules/caffeine.pdb');
+    loadMolecule('models/molecules/caffeine.pdb', -15,0,0);
+    loadMolecule('models/molecules/ethanol.pdb',15,0,0);
     createMenu();
 
     document.addEventListener('mousedown', onDocumentMouseDown, false);
@@ -102,7 +100,7 @@ function init() {
 //#region Menu
 function generateButtonCallback(url) {
     return function () {
-        loadMolecule(url);
+        loadMolecule(url, 0,0,0);
     };
 }
 
@@ -118,9 +116,11 @@ function createMenu() {
 //#endregion
 
 //#region Carregar moleculas
-function loadMolecule(url) {
-    while (modelos.children.length > 0) {
-        var object = modelos.children[0];
+function loadMolecule(url,x,y,z) {
+    var modelo = new THREE.Group();
+
+    while (modelo.children.length > 0) {
+        var object = modelo.children[0];
         object.parent.remove(object);
     }
 
@@ -139,9 +139,9 @@ function loadMolecule(url) {
         var position = new THREE.Vector3();
         var color = new THREE.Color();
         for (var i = 0; i < positions.count; i++) {
-            position.x = positions.getX(i);
-            position.y = positions.getY(i);
-            position.z = positions.getZ(i);
+            position.x = positions.getX(i) + x;
+            position.y = positions.getY(i) + y;
+            position.z = positions.getZ(i) + z;
             color.r = colors.getX(i);
             color.g = colors.getY(i);
             color.b = colors.getZ(i);
@@ -150,7 +150,7 @@ function loadMolecule(url) {
             object.position.copy(position);
             object.position.multiplyScalar(75);
             object.scale.multiplyScalar(25);
-            modelos.add(object);
+            modelo.add(object);
             var atom = json.atoms[i];
             var text = document.createElement('div');
             text.className = 'label';
@@ -158,18 +158,18 @@ function loadMolecule(url) {
             text.textContent = atom[4];
             var label = new THREE.CSS2DObject(text);
             label.position.copy(object.position);
-            modelos.add(label);
+            modelo.add(label);
         }
         positions = geometryBonds.getAttribute('position');
         var start = new THREE.Vector3();
         var end = new THREE.Vector3();
         for (var i = 0; i < positions.count; i += 2) {
-            start.x = positions.getX(i);
-            start.y = positions.getY(i);
-            start.z = positions.getZ(i);
-            end.x = positions.getX(i + 1);
-            end.y = positions.getY(i + 1);
-            end.z = positions.getZ(i + 1);
+            start.x = positions.getX(i) + x;
+            start.y = positions.getY(i) + y;
+            start.z = positions.getZ(i) + z;
+            end.x = positions.getX(i + 1) + x;
+            end.y = positions.getY(i + 1) + y;
+            end.z = positions.getZ(i + 1) + z;
             start.multiplyScalar(75);
             end.multiplyScalar(75);
             var object = new THREE.Mesh(boxGeometry, new THREE.MeshPhongMaterial(0xffffff));
@@ -177,9 +177,10 @@ function loadMolecule(url) {
             object.position.lerp(end, 0.5);
             object.scale.set(5, 5, start.distanceTo(end));
             object.lookAt(end);
-            modelos.add(object);
+            modelo.add(object);
         }
-        objects.push(modelos);
+        cena.add(modelo);
+        modelos.push(modelo);
     });
 }
 //#endregion
@@ -226,13 +227,13 @@ function onDocumentMouseDown(event) {
     // Set the raycaster position
     raycaster.set(camera.position, vector.sub(camera.position).normalize());
     // Find all intersected objects
-    var intersects = raycaster.intersectObjects(objects, true);
+    var intersects = raycaster.intersectObjects(modelos, true, modelos[0]);
+    console.log(intersects);
     if (intersects.length > 0) {
         // Disable the controls
         controls.enabled = false;
         // Set the selection - first intersected object
         selection = intersects[0].object;
-        console.log(selection);
         // Calculate the offset
         var intersects = raycaster.intersectObject(plane, true);
         offset.copy(intersects[0].point).sub(plane.position);
@@ -256,7 +257,7 @@ function onDocumentMouseMove(event) {
         selection.position.copy(intersects[0].point.sub(offset));
     } else {
         // Update position of the plane if need
-        var intersects = raycaster.intersectObjects(objects, true);
+        var intersects = raycaster.intersectObjects(modelos, true);
         if (intersects.length > 0) {
             plane.position.copy(intersects[0].object.position);
             plane.lookAt(camera.position);
@@ -271,12 +272,39 @@ function onDocumentMouseUp(event) {
 }
 //#endregion
 
+ //#region mover objeto com Teclas
+ function processaTeclas() {
+    var vel = 15;
+    if (teclas[37]) { //seta esquerda
+        modelos[0].position.x -= vel;
+    }
+    if (teclas[39]) { //seta direita
+        modelos[0].position.x += vel;
+    }
+    if (teclas[38]) { //seta cima
+        modelos[0].position.y += vel;
+    }
+    if (teclas[40]) { //seta baixo
+        modelos[0].position.y -= vel;
+    }
+}
+document.onkeyup = function (evt) {
+    teclas[evt.keyCode] = false;
+}
+
+document.onkeydown = function (evt) {
+    teclas[evt.keyCode] = true;
+}
+//#endregion
+
+
 function desenhar() {
     stats.begin();
+    processaTeclas();
     render.render(cena, camera);
     labelRenderer.render(cena, camera);
-    //camera.lookAt(modelos.position);
-    //camera.position.x = modelos.position.x;
+    //camera.lookAt(modelos[0].position);
+    //camera.position.x = modelo.position.x;
     controls.update();
     stats.end();
     requestAnimationFrame(desenhar);
