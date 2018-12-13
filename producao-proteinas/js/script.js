@@ -2,7 +2,7 @@
 //instancias
 var stats = new Stats();
 var cena = new THREE.Scene();
-var camera = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, 1, 10000);
+var camera = new THREE.PerspectiveCamera(50, window.innerWidth / window.innerHeight, 0.1, 5000);
 var render = new THREE.WebGLRenderer({
     antialias: true
 });
@@ -81,8 +81,8 @@ function init() {
 
 
     //Carrega modelo inicial e cria menu
-    loadMolecule('models/molecules/caffeine.pdb', -15,0,0);
-    loadMolecule('models/molecules/ethanol.pdb',15,0,0);
+    loadMolecule('models/molecules/glucose.pdb', -15,0,0);
+    loadMolecule('models/molecules/cu.pdb',15,0,0);
     createMenu();
 
     document.addEventListener('mousedown', onDocumentMouseDown, false);
@@ -102,6 +102,7 @@ function generateButtonCallback(url) {
     return function () {
         loadMolecule(url, 0,0,0);
     };
+    
 }
 
 function createMenu() {
@@ -181,6 +182,7 @@ function loadMolecule(url,x,y,z) {
         }
         cena.add(modelo);
         modelos.push(modelo);
+        console.log(modelos)
     });
 }
 //#endregion
@@ -276,16 +278,16 @@ function onDocumentMouseUp(event) {
  function processaTeclas() {
     var vel = 15;
     if (teclas[37]) { //seta esquerda
-        modelos[0].position.x -= vel;
+        modelos[2].position.x -= vel;
     }
     if (teclas[39]) { //seta direita
-        modelos[0].position.x += vel;
+        modelos[2].position.x += vel;
     }
     if (teclas[38]) { //seta cima
-        modelos[0].position.y += vel;
+        modelos[2].position.y += vel;
     }
     if (teclas[40]) { //seta baixo
-        modelos[0].position.y -= vel;
+        modelos[2].position.y -= vel;
     }
 }
 document.onkeyup = function (evt) {
@@ -304,7 +306,7 @@ function desenhar() {
     render.render(cena, camera);
     labelRenderer.render(cena, camera);
     //camera.lookAt(modelos[0].position);
-    //camera.position.x = modelo.position.x;
+    //camera.position.x = modelos[2].position.x;
     controls.update();
     stats.end();
     requestAnimationFrame(desenhar);
