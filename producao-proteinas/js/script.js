@@ -31,7 +31,7 @@ var MOLECULES = {
 };
 
 var teclas = [];
-var controls = new THREE.TrackballControls(camera);
+//var controls = new THREE.TrackballControls(camera);
 var dragControls;
 
 // used for drag and drop
@@ -43,6 +43,7 @@ var raycaster = new THREE.Raycaster();
  // Datasources
  NGL.DatasourceRegistry.add("data", new NGL.StaticDatasource("models/molecules/"))
  var stage = new NGL.Stage();
+
 //#region Init
 function init() {
     //Posição da camera
@@ -86,16 +87,23 @@ function init() {
     //loadMolecule('models/molecules/dna.pdb',15,0,0);
 
     stage = new NGL.Stage('viewport');
+    stage.handleResize();
+    stage.loadFile("https://files.rcsb.org/view/1BPX.pdb").then(function (o) {
+        o.setPosition([50, 0, 0]);
+        o.setRotation([ 0, 0, 0 ]);
+        o.setScale(0.5);
+        o.addRepresentation("cartoon"); 
+        o.addRepresentation("base");
+      });
     stage.loadFile("models/molecules/3sn6.cif").then(function (o) {
-        o.setPosition([-200, 0, 0]);
-        o.setRotation([ 2, 0, 0 ]);
+        o.setPosition([-100, 0, 0]);
+        o.setRotation([ 0, 0, 0 ]);
         o.setScale(0.5);
         o.addRepresentation("cartoon");
-        stage.autoView();
       });
     stage.loadFile("models/molecules/caffeine.pdb", {defaultRepresentation: true});
     stage.keyControls.add("i", NGL.KeyActions.autoView);
-
+    stage.mouseControls.add("drag-left+right", NGL.MouseActions.panComponentDrag);
     createMenu();
 
     document.addEventListener('mousedown', onDocumentMouseDown, false);
@@ -104,6 +112,7 @@ function init() {
 
     document.addEventListener('mouseup', onDocumentMouseUp, false);
 
+    
     //chamada da função desenhar
     desenhar();
 }
@@ -115,6 +124,7 @@ function init() {
 function generateButtonCallback(url) {
     return function () {
         console.log(stage.compList[0])
+        posicao = stage.compList[0].position.x;
         //loadMolecule(url, 0,0,0);
     };
     
@@ -245,7 +255,6 @@ function onDocumentMouseDown(event) {
     raycaster.set(camera.position, vector.sub(camera.position).normalize());
     // Find all intersected objects
     var intersects = raycaster.intersectObjects(modelos, true, modelos[0]);
-    console.log(intersects);
     if (intersects.length > 0) {
         // Disable the controls
         controls.enabled = false;
@@ -284,7 +293,7 @@ function onDocumentMouseMove(event) {
 
 function onDocumentMouseUp(event) {
     // Enable the controls
-    controls.enabled = true;
+    //controls.enabled = true;
     selection = null;
 }
 //#endregion
@@ -316,13 +325,13 @@ document.onkeydown = function (evt) {
 
 
 function desenhar() {
+    
     stats.begin();
     processaTeclas();
     render.render(cena, camera);
     //labelRenderer.render(cena, camera);
     //camera.lookAt(modelos[0].position);
-    //camera.position.x = modelos[2].position.x;
-    controls.update();
+    //controls.update();
     stats.end();
     requestAnimationFrame(desenhar);
 }
