@@ -6,6 +6,7 @@ var camera = new THREE.PerspectiveCamera(50, window.innerWidth / window.innerHei
 var render = new THREE.WebGLRenderer({
     antialias: true
 });
+// var glmol = new GLmol('container', true);
 var loader = new THREE.PDBLoader();
 var labelRenderer = new THREE.CSS2DRenderer();
 var menu;
@@ -39,10 +40,11 @@ var plane;
 var selection;
 var offset = new THREE.Vector3();
 var raycaster = new THREE.Raycaster();
-
+ // Datasources
+ NGL.DatasourceRegistry.add("data", new NGL.StaticDatasource("models/molecules/"))
+ var stage = new NGL.Stage();
 //#region Init
 function init() {
-
     //Posição da camera
     camera.position.z = 1000;
 
@@ -79,10 +81,21 @@ function init() {
     stats.showPanel(0); // 0: fps, 1: ms, 2: mb, 3+: custom
     document.body.appendChild(stats.dom);
 
-
     //Carrega modelo inicial e cria menu
-    loadMolecule('models/molecules/glucose.pdb', -15,0,0);
-    loadMolecule('models/molecules/cu.pdb',15,0,0);
+    //loadMolecule('models/molecules/glucose.pdb', -15,0,0);
+    //loadMolecule('models/molecules/dna.pdb',15,0,0);
+
+    stage = new NGL.Stage('viewport');
+    stage.loadFile("models/molecules/3sn6.cif").then(function (o) {
+        o.setPosition([-200, 0, 0]);
+        o.setRotation([ 2, 0, 0 ]);
+        o.setScale(0.5);
+        o.addRepresentation("cartoon");
+        stage.autoView();
+      });
+    stage.loadFile("models/molecules/caffeine.pdb", {defaultRepresentation: true});
+    stage.keyControls.add("i", NGL.KeyActions.autoView);
+
     createMenu();
 
     document.addEventListener('mousedown', onDocumentMouseDown, false);
@@ -97,10 +110,12 @@ function init() {
 
 //#endregion
 
+
 //#region Menu
 function generateButtonCallback(url) {
     return function () {
-        loadMolecule(url, 0,0,0);
+        console.log(stage.compList[0])
+        //loadMolecule(url, 0,0,0);
     };
     
 }
@@ -304,7 +319,7 @@ function desenhar() {
     stats.begin();
     processaTeclas();
     render.render(cena, camera);
-    labelRenderer.render(cena, camera);
+    //labelRenderer.render(cena, camera);
     //camera.lookAt(modelos[0].position);
     //camera.position.x = modelos[2].position.x;
     controls.update();
