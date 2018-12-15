@@ -1,53 +1,85 @@
-body {
-    margin: 0;
-    font-family: Arial;
-    overflow: hidden;
-}
-a {
-    color: #ffffff;
-}
-#info {
-    position: absolute;
-    top: 0px;
-    width: 100%;
-    color: #ffffff;
-    padding: 5px;
-    font-family: Monospace;
-    font-size: 13px;
-    font-weight: bold;
-    text-align: center;
-    z-index: 1;
-}
-#menu {
-    position: absolute;
-    bottom: 20px;
-    width: 100%;
-    text-align: center;
-    padding: 0;
-    margin: 0;
-}
-button {
-    color: rgb(255,255,255);
-    background: transparent;
-    border: 0px;
-    padding: 5px 10px;
-    cursor: pointer;
-}
-button:hover {
-    background-color: rgba(0,255,255,0.5);
-}
-button:active {
-    color: #000000;
-    background-color: rgba(0,255,255,1);
-}
-.label {
-    text-shadow: -1px 1px 1px rgb(0,0,0);
-    margin-left: 25px;
+
+* {
+	vertical-align: middle;
 }
 
-#viewport{
-    width: 100%;
-    height: 100%;
-    background-color: black;
-    position: absolute;
+
+/* elmement */
+
+body {
+	font-family: Arial, sans-serif;
+	font-size: 14px;
+	margin: 0;
+	overflow: hidden;
 }
+
+/* class */
+.title {
+    font-weight: bold;
+}
+
+/* id */
+
+#viewport {
+    position: absolute;
+    top: 0px;
+    left: 0px;
+    right: 300px;
+    bottom: 0px;
+}
+
+#sidebar {
+    position: absolute;
+    right: 0px;
+    top: 0px;
+    bottom: 0px;
+    width: 300px;
+    overflow: hidden;
+}
+
+    #sidebar .Panel {
+        margin-bottom: 10px;
+    }
+
+    #sidebar .Panel.collapsed {
+        margin-bottom: 0px;
+    }
+
+    #sidebar .option {
+        margin-top: 10px;
+        cursor: pointer;
+
+    }
+
+    #sidebar > .Panel {
+        padding: 10px;
+        border-top: 1px solid;
+    }
+
+    #sidebar > .Content > .menu {
+        padding: 10px;
+        border-top: 1px solid;
+        border-color: #cccccc;
+    }
+
+    #sidebar > .Content > .menu > .options {
+        padding-left: 10px;
+    }
+
+    #sidebar > .Content > .menu > .options > .option{
+        padding: 5px 10px;
+        margin: 0px !important;
+    }
+
+    #sidebar > .Content > .menu > .options > .option:hover{
+        background-color: #546E7A;
+    }
+
+    #sidebar .Content {
+        top: 40px;
+        bottom: 0px;
+        position: absolute;
+        overflow: auto;
+        right: 0px;
+        width: 100%;
+    }
