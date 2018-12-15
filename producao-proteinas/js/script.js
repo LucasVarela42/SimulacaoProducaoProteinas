@@ -21,7 +21,10 @@ function init() {
     NGL.StageWidget(stage)
     
     var load = NGL.getQuery("load")
-    if (load) stage.loadFile(load, { defaultRepresentation: true })
+    if (load) stage.loadFile(load).then(function (o) {
+        o.addRepresentation("ball+stick");
+        o.autoView();
+      });
 }
 
 window.onload = init();

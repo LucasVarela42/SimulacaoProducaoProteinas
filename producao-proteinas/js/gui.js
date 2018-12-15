@@ -24,9 +24,6 @@ NGL.StageWidget = function (stage) {
     if (value === 'light') {
       cssPath = NGL.cssDirectory + 'light.css'
       bgColor = 'white'
-    } else {
-      cssPath = NGL.cssDirectory + 'dark.css'
-      bgColor = 'black'
     }
     cssLinkElement.href = cssPath
     stage.setParameters({ backgroundColor: bgColor })
@@ -39,6 +36,12 @@ NGL.StageWidget = function (stage) {
   document.body.appendChild(sidebar.dom)
 
   stage.handleResize()
+  
+  stage.mouseControls.remove( "drag-ctrl-left" );
+  stage.mouseControls.remove( "drag-shift-left" );
+
+  stage.mouseControls.add("drag-ctrl-left", NGL.MouseActions.panComponentDrag);
+  stage.mouseControls.add("drag-shift-left", NGL.MouseActions.panAtomDrag);
 
   this.viewport = viewport
   this.sidebar = sidebar
