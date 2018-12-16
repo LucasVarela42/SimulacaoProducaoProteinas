@@ -19,12 +19,6 @@ function init() {
     //stage.viewer.container.appendChild(stats.dom);
     
     NGL.StageWidget(stage)
-    
-    var load = NGL.getQuery("load")
-    if (load) stage.loadFile(load).then(function (o) {
-        o.addRepresentation("ball+stick");
-        o.autoView();
-      });
 }
 
 window.onload = init();

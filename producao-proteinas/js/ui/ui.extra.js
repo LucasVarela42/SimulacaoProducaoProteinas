@@ -299,7 +299,7 @@ UI.ToggleIcon.prototype.getValue = function () {
 // Dispose Icon
 
 UI.DisposeIcon = function () {
-  UI.Icon.call(this, 'trash-o')
+  UI.Icon.call(this, 'trash-alt')
 
   var flag = false
   var scope = this

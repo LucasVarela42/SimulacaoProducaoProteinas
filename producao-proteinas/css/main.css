@@ -37,9 +37,7 @@ body {
     overflow: hidden;
 }
 
-    #sidebar .Panel {
-        margin-bottom: 10px;
-    }
+  
 
     #sidebar .Panel.collapsed {
         margin-bottom: 0px;
@@ -56,10 +54,18 @@ body {
         border-top: 1px solid;
     }
 
+    #sidebar .Panel .Text {
+        font-weight: bold;
+    }
+
     #sidebar > .Content > .menu {
         padding: 10px;
         border-top: 1px solid;
         border-color: #cccccc;
+    }
+
+    #sidebar > .Content > .menu > .Panel {
+        padding-left: 10px;
     }
 
     #sidebar > .Content > .menu > .options {

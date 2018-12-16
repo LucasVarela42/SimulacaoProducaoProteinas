@@ -303,10 +303,6 @@ UI.ComponentPanel = function (component) {
     toggle.setValue(value)
   })
 
-  signals.disposed.add(function () {
-    menu.dispose()
-  })
-
   // Name
 
   var name = new UI.EllipsisText(component.name)
@@ -322,7 +318,7 @@ UI.ComponentPanel = function (component) {
       component.setVisibility(!component.visible)
     })
 
-  var center = new UI.Icon('bullseye')
+  var center = new UI.Icon('crosshairs')
     .setTitle('center')
     .setCursor('pointer')
     .setMarginLeft('10px')
@@ -336,19 +332,8 @@ UI.ComponentPanel = function (component) {
       stage.removeComponent(component)
     })
 
-    // Menu
+  this.add(name, toggle, center, dispose)
 
-  var menu = new UI.PopupMenu('bars', component.type)
-    .setMarginLeft('46px')
-    .setEntryLabelWidth('110px')
-
-    //
-
-  this.add(name, toggle, center, dispose, menu)
-
-  //
-
-  this.menu = menu
 
   return this
 }

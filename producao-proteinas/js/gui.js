@@ -62,14 +62,38 @@ NGL.ViewportWidget = function (stage) {
 // Sidebar
 
 NGL.SidebarWidget = function (stage) {
+  var signals = stage.signals
   var container = new UI.Panel()
+
+  var compList = []
+  var widgetList = []
 
   var widgetContainer = new UI.Panel().setClass('Content')
   var title = new UI.Panel().setClass('Panel Sticky').setFloat('left').add(
     new UI.Text('Visualizador de moleculas').setClass('title'))
 
   widgetContainer.add(new NGL.SidebarArquivoWidget(stage));
+  
   widgetContainer.add(new NGL.SidebarCameraWidget(stage));
+  
+  signals.componentAdded.add(function (component) {
+    var widget
+    widget = new NGL.SidebarMoleculasWidget(component)
+    widgetContainer.add(widget)
+    compList.push(component)
+    widgetList.push(widget)
+  })
+
+  signals.componentRemoved.add(function (component) {
+    var idx = compList.indexOf(component)
+
+    if (idx !== -1) {
+      widgetList[ idx ].dispose()
+
+      compList.splice(idx, 1)
+      widgetList.splice(idx, 1)
+    }
+  })
 
   container.add(
     title,
@@ -148,6 +172,15 @@ NGL.SidebarArquivoWidget = function (stage) {
   optionsPanel.dom.appendChild(fileInput)
 
   return UI.MenubarHelper.createMenuContainer('Arquivo', optionsPanel)
+}
+
+NGL.SidebarMoleculasWidget = function (component) {
+  var container = new UI.Panel().setClass('menu')
+  var componentPanel = new UI.ComponentPanel(component)
+
+  container.add(componentPanel)
+
+  return container
 }
 
 NGL.SidebarCameraWidget = function (stage) {
