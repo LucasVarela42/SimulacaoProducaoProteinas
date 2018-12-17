@@ -74,6 +74,11 @@ NGL.OverviewWidget = function () {
     .setMaxWidth('600px')
     .setOverflow('auto')
 
+  var footerPanel = new UI.Panel()
+    .setBorderTop('1px solid #555')
+    .setHeight('105px')
+    .setPadding('5px')
+
   headingPanel.add(
     new UI.Text('Visualizador de moleculas').setFontStyle('italic'),
     new UI.Html('&nbsp;&mdash;&nbsp;Controles gerais')
@@ -88,9 +93,14 @@ NGL.OverviewWidget = function () {
       })
   )
 
+  footerPanel.add(
+    new UI.Text('Instituto Federal de Santa Catarina').setFontStyle('bold'),
+    new UI.Html('&nbsp;&mdash;&nbsp;Campus Lages')
+  )
+
   container.add(headingPanel)
   container.add(listingPanel)
-
+  container.add(footerPanel)
   //
 
   function addIcon(name, text) {
@@ -150,6 +160,19 @@ NGL.OverviewWidget = function () {
       '<strong>Para encontrar e baixar as moleculas acesse: </strong>' +
       "<a href='https://www.rcsb.org/' target='https://www.rcsb.org/'>RCSB Protein Data Bank</a>."
     )))
+
+    footerPanel
+    .add(new UI.Break())
+    .add(new UI.Text('Acadêmicos:'))
+    .add(new UI.Html(
+      '<ul>' +
+      '<li>Edoardo Colares</li>' +
+      '<li>Lucas Dos Anjos Varela</li>' +
+      '<li>Matheus De Medeiros</li>' +
+      '<li>Vinícius Waltrick</li>' +
+      '</ul>'
+    ))
+
   return container
 }
 
