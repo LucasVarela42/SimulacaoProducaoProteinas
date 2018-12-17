@@ -5,15 +5,12 @@
  * @author Alexander Rose <alexander.rose@weirdbyte.de>
  */
 
-// Stage
-
-NGL.StageWidget = function (stage) {
+ NGL.StageWidget = function (stage) {
   var viewport = new NGL.ViewportWidget(stage).setId('viewport')
   document.body.appendChild(viewport.dom)
 
   // ensure initial focus on viewer canvas for key-stroke listening
   stage.viewer.renderer.domElement.focus()
-
 
   var cssLinkElement = document.createElement('link')
   cssLinkElement.rel = 'stylesheet'
@@ -32,24 +29,27 @@ NGL.StageWidget = function (stage) {
   setTheme('light')
   document.head.appendChild(cssLinkElement)
 
+  var overview = new NGL.OverviewWidget().setOpacity('0.9')
+    .setDisplay('inline-block')
+  document.body.appendChild(overview.dom)
+
   var sidebar = new NGL.SidebarWidget(stage).setId('sidebar')
   document.body.appendChild(sidebar.dom)
 
   stage.handleResize()
-  
-  stage.mouseControls.remove( "drag-ctrl-left" );
-  stage.mouseControls.remove( "drag-shift-left" );
+
+  stage.mouseControls.remove("drag-ctrl-left");
+  stage.mouseControls.remove("drag-shift-left");
 
   stage.mouseControls.add("drag-ctrl-left", NGL.MouseActions.panComponentDrag);
   stage.mouseControls.add("drag-shift-left", NGL.MouseActions.panAtomDrag);
 
+  this.overview = overview
   this.viewport = viewport
   this.sidebar = sidebar
 
   return this
 }
-
-// Viewport
 
 NGL.ViewportWidget = function (stage) {
   var viewer = stage.viewer
@@ -59,7 +59,99 @@ NGL.ViewportWidget = function (stage) {
   return container
 }
 
-// Sidebar
+NGL.OverviewWidget = function () {
+  var container = new UI.OverlayPanel()
+  var headingPanel = new UI.Panel()
+    .setBorderBottom('1px solid #555')
+    .setHeight('25px')
+    .setPadding('5px')
+
+  var listingPanel = new UI.Panel()
+    .setPadding('10px')
+    .setMarginTop('5px')
+    .setMinHeight('100px')
+    .setMaxHeight('500px')
+    .setMaxWidth('600px')
+    .setOverflow('auto')
+
+  headingPanel.add(
+    new UI.Text('Visualizador de moleculas').setFontStyle('italic'),
+    new UI.Html('&nbsp;&mdash;&nbsp;Controles gerais')
+  )
+  headingPanel.add(
+    new UI.Icon('times')
+      .setCursor('pointer')
+      .setMarginLeft('20px')
+      .setFloat('right')
+      .onClick(function () {
+        container.setDisplay('none')
+      })
+  )
+
+  container.add(headingPanel)
+  container.add(listingPanel)
+
+  //
+
+  function addIcon(name, text) {
+    var panel = new UI.Panel()
+
+    var icon = new UI.Icon(name)
+      .setWidth('20px')
+      .setFloat('left')
+
+    var label = new UI.Text(text)
+      .setDisplay('inline')
+      .setMarginLeft('5px')
+
+    panel
+      .setMarginLeft('20px')
+      .add(icon, label)
+    listingPanel.add(panel)
+  }
+
+  listingPanel
+    .add(new UI.Panel().add(new UI.Html("Para carregar uma nova molecula clique em <i>Abrir modelo</i> no menu ao lado.")))
+    .add(new UI.Break())
+
+  listingPanel
+  .add(new UI.Panel().add(new UI.Html("Para buscar uma molecula digite em <i>Buscar modelo PDB</i> o Id da molecula desejada. O Id pode ser encontrado no link abaixo. Ex.: 1D66 (molecula do DNA)")))
+  .add(new UI.Break())
+
+  listingPanel
+  .add(new UI.Panel().add(new UI.Html("Para salvar a imagem da molecula clique em <i>Screenshot</i>.")))
+  .add(new UI.Break())
+
+
+  listingPanel
+    .add(new UI.Text('Controles do mouse:'))
+    .add(new UI.Html(
+      '<ul>' +
+      '<li>Botão esquerdo precionado rotaciona a camera.</li>' +
+      '<li>Botão esquerdo clicado foca no atomo.</li>' +
+      '<li>Scroll do mouse realiza o zoom na camera.</li>' +
+      '<li>Ctrl + Botão esquerdo precionado move a molecula na tela.</li>' +
+      '<li>Shift + Botão esquerdo precionado move um atomo da molecula na tela.</li>' +
+      '</ul>'
+    ))
+
+
+  listingPanel
+    .add(new UI.Panel().add(new UI.Text('Ações dos icones na molecula carregada:')))
+    .add(new UI.Break())
+
+  addIcon('eye', 'Controla a visibilidade da molecula.')
+  addIcon('crosshairs', 'Centraliza a camera na molecula.')
+  addIcon('trash-alt', 'Deleta a molecula. É preciso clicar duas vezes para confirmar a ação.')
+
+  listingPanel
+    .add(new UI.Break())
+    .add(new UI.Panel().add(new UI.Html(
+      '<strong>Para encontrar e baixar as moleculas acesse: </strong>' +
+      "<a href='https://www.rcsb.org/' target='https://www.rcsb.org/'>RCSB Protein Data Bank</a>."
+    )))
+  return container
+}
 
 NGL.SidebarWidget = function (stage) {
   var signals = stage.signals
@@ -73,9 +165,9 @@ NGL.SidebarWidget = function (stage) {
     new UI.Text('Visualizador de moleculas').setClass('title'))
 
   widgetContainer.add(new NGL.SidebarArquivoWidget(stage));
-  
+
   widgetContainer.add(new NGL.SidebarCameraWidget(stage));
-  
+
   signals.componentAdded.add(function (component) {
     var widget
     widget = new NGL.SidebarMoleculasWidget(component)
@@ -88,7 +180,7 @@ NGL.SidebarWidget = function (stage) {
     var idx = compList.indexOf(component)
 
     if (idx !== -1) {
-      widgetList[ idx ].dispose()
+      widgetList[idx].dispose()
 
       compList.splice(idx, 1)
       widgetList.splice(idx, 1)

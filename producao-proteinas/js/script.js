@@ -17,7 +17,6 @@ function init() {
     //estatistica do fps
     //stats.showPanel(0); // 0: fps, 1: ms, 2: mb, 3+: custom
     //stage.viewer.container.appendChild(stats.dom);
-    
     NGL.StageWidget(stage)
 }
 
